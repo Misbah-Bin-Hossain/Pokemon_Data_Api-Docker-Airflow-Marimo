@@ -5,7 +5,7 @@ import json
 
 
 BASE_URL = "https://pokeapi.co/api/v2"
-LIMIT = 10000  # change to None for all data
+LIMIT = 10  # change to None for all data
 
 
 def fetch_data(endpoint, limit=LIMIT):
