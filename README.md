@@ -2,7 +2,8 @@
 
 ### Welcome to my **end-to-end ETL project** 
 
-                    ![pokemon-drake](https://github.com/user-attachments/assets/2f94c9e1-4397-4162-a5cd-3127ccae71f5)
+  
+  ![pokemon-drake](https://github.com/user-attachments/assets/2f94c9e1-4397-4162-a5cd-3127ccae71f5)
 
 
 Here I fetch data from the public [PokéAPI](https://pokeapi.co/), process it, and store it in a **Postgres database**.  
