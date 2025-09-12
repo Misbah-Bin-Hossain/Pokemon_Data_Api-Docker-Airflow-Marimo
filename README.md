@@ -9,8 +9,8 @@ I orchestrate the pipeline with **Apache Airflow**, visualize and explore with *
 
 - **🐘 Postgres** → to persist Pokémon data (and keep it even if containers stop).  
 - **🌬️ Apache Airflow** → to orchestrate ETL tasks (Extract → Transform → Load) with scheduling and monitoring.  
-- **📦 Docker Compose** → to run multiple services (Airflow, Postgres, UV/Marimo) together in isolated containers.  
-- **🧩 Marimo (in UV container)** → interactive notebook environment to query Postgres, test ETL queries, and visualize results.  
+- **📦 Docker Compose** → to run multiple services (Airflow, Postgres, Python/Marimo) together in isolated containers.  
+- **🧩 Marimo (in python_etl container)** → interactive notebook environment to query Postgres, test ETL queries, and visualize results.  
 - **🐍 Python** → for the ETL scripts (using `requests`, `psycopg2`, `pandas`).
 
 ---
@@ -26,13 +26,14 @@ I orchestrate the pipeline with **Apache Airflow**, visualize and explore with *
 │   └── requirements.txt
 ├── postgres/                 # Postgres setup
 │   └── init.sql              # Schema creation
-├── uv/                       # Marimo / Notebook container
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── (optional app.py if API trigger is needed)
 ├── docker-compose.yml         # Orchestrates all services
 ├── pyproject.toml             # Python project dependencies
 └── README.md
+├── python/                    # Python ETL scripts & Marimo notebooks
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── etl.py
+│   └── notebooks/             # Notebooks live here
 ```
 
 ---
@@ -54,7 +55,7 @@ This will start:
 - `postgres` → database  
 - `airflow-webserver` → Airflow UI at [http://localhost:8080](http://localhost:8080)  
 - `airflow-scheduler` → runs DAGs  
-- `uv` → Marimo notebooks at [http://localhost:5000](http://localhost:5000)  
+- `python_etl` → Marimo notebooks at [http://localhost:8888](http://localhost:8888)  
 
 ### 3. Login Airflow
 
@@ -67,37 +68,21 @@ This will start:
 
 ### 4. Access Marimo
 
-To access Marimo in the `uv` container, follow these steps:
+Marimo starts automatically in the `python_etl` container. Just open your browser and go to:
 
+[http://localhost:8888](http://localhost:8888)
+Then enter the Access token provided in the Terminal
+
+No need to manually enter the container, create a virtual environment, or install packages—this is all handled by the Dockerfile during build.
+
+If you want to run a shell in the container for debugging or custom scripts:
 ```bash
-# 1. (Re)build and start the uv container
-#    --force-recreate ensures a fresh container, --build applies any changes
-
-docker compose up -d --force-recreate --build uv
-
-# 2. Enter the running uv container interactively
-
-docker exec -it etl-pipeline-project-uv-1 bash
-
-# 3. (Optional but recommended) Create a virtual environment for isolation
-python -m venv .venv
-
-# 4. Activate the virtual environment
-source .venv/bin/activate
-
-# 5. Install required Python packages for Marimo and data analysis
-pip install matplotlib pandas marimo
-
-# 6. Start Marimo, making it accessible from your browser
-python -m marimo edit --host 0.0.0.0 --port 8888
+docker exec -it python_etl bash
 ```
+--Inside Marimo install the required packages to see the visuals (This is to make process faster, as if its is automated, it will take more time)
+    
+    "Then after Installation Shift to Toggle View to have a better Visual"
 
-#### Why these steps?
-- **Rebuilding the container** ensures any changes to dependencies or code are applied, and avoids issues from stale environments.
-- **Entering the container** lets you run commands in the same environment where Marimo will operate.
-- **Using a virtual environment** keeps dependencies isolated, preventing conflicts with system or base image packages.
-- **Installing packages** ensures Marimo and data tools (matplotlib, pandas) are available, even if not pre-installed in the image.
-- **Running Marimo with `--host 0.0.0.0`** makes it accessible from your host machine at [http://localhost:8888](http://localhost:8888).
 
 ---
 
@@ -201,10 +186,10 @@ psycopg2.errors.InvalidTextRepresentation: malformed array literal
 ---
 
 ### 3. ❌ Marimo notebooks lost after container stop
-- **Cause:** No **volume** mounted in `uv` service.  
+- **Cause:** No **volume** mounted in `python` service.  
 - **Fix:** Added a volume so notebooks persist:
 ```yaml
-uv:
+python_etl:
   volumes:
     - ./notebooks:/app/notebooks
 ```
@@ -245,7 +230,7 @@ uv:
 ## 🖥️ Demo
 
 - **Airflow UI:** [http://localhost:8080](http://localhost:8080)  
-- **Marimo Notebook:** [http://localhost:5000](http://localhost:5000)  
+- **Marimo Notebook:** [http://localhost:8888](http://localhost:8888)  
 <img width="888" height="991" alt="image" src="https://github.com/user-attachments/assets/57a2ccc9-c5d1-48a9-9a87-4cd9a60afc0b" />
 
 ---
@@ -256,6 +241,3 @@ image.png
 Pull requests welcome! If you’d like to add new DAGs, expand schema, or improve docs, feel free.
 
 ---
-
-## 📜 License
-MIT License.
