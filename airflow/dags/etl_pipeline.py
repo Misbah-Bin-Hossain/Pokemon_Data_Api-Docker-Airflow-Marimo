@@ -1,3 +1,14 @@
+"""
+Airflow DAG definition for the ETL pipeline.
+This file may serve as a minimal wrapper or entrypoint for the main ETL DAG logic.
+"""
+
+# (Add your DAG/task code here or import from etl.py)
+# If this file is intentionally minimal, you can use it to register the DAG from etl.py
+
+# Example:
+# from .etl import dag
+
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime

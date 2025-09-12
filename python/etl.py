@@ -1,14 +1,27 @@
+"""
+ETL script for fetching Pokémon data from PokéAPI and loading it into Postgres.
+Includes functions to fetch Pokémon, items, moves, generations, and load them into the database.
+"""
+
 import requests
 import psycopg2
 import time
 import json
 
-
+# Base URL for PokéAPI
 BASE_URL = "https://pokeapi.co/api/v2"
+# Default limit for API requests (set to None to fetch all data)
 LIMIT = 10000  # change to None for all data
 
-
 def fetch_data(endpoint, limit=LIMIT):
+    """
+    Fetch a list of resources from a given PokéAPI endpoint.
+    Args:
+        endpoint (str): API endpoint (e.g., 'pokemon', 'item').
+        limit (int): Number of records to fetch.
+    Returns:
+        list: List of resource dicts with 'name' and 'url'.
+    """
     url = f"{BASE_URL}/{endpoint}"
     if limit:
         url += f"?limit={limit}"
@@ -16,14 +29,26 @@ def fetch_data(endpoint, limit=LIMIT):
     response.raise_for_status()
     return response.json()["results"]
 
-
 def fetch_detail(url):
+    """
+    Fetch detailed data for a single resource from its URL.
+    Args:
+        url (str): Resource URL.
+    Returns:
+        dict: Detailed resource data.
+    """
     response = requests.get(url)
     response.raise_for_status()
     return response.json()
 
-
 def fetch_pokemon(limit=LIMIT):
+    """
+    Fetch detailed Pokémon data from PokéAPI.
+    Args:
+        limit (int): Number of Pokémon to fetch.
+    Returns:
+        list: List of Pokémon data dicts.
+    """
     pokemon_list = fetch_data("pokemon", limit)
     data = []
     for idx, p in enumerate(pokemon_list, start=1):
@@ -41,11 +66,17 @@ def fetch_pokemon(limit=LIMIT):
         })
         if idx % 10 == 0:
             print(f"Processed {idx} Pokémon...")
-            time.sleep(0.5)
+            time.sleep(0.5)  # Throttle requests to avoid rate limits
     return data
 
-
 def fetch_items(limit=LIMIT):
+    """
+    Fetch detailed item data from PokéAPI.
+    Args:
+        limit (int): Number of items to fetch.
+    Returns:
+        list: List of item data dicts.
+    """
     item_list = fetch_data("item", limit)
     data = []
     for i in item_list:
@@ -59,8 +90,14 @@ def fetch_items(limit=LIMIT):
         })
     return data
 
-
 def fetch_moves(limit=LIMIT):
+    """
+    Fetch detailed move data from PokéAPI.
+    Args:
+        limit (int): Number of moves to fetch.
+    Returns:
+        list: List of move data dicts.
+    """
     move_list = fetch_data("move", limit)
     data = []
     for m in move_list:
@@ -76,8 +113,14 @@ def fetch_moves(limit=LIMIT):
         })
     return data
 
-
 def fetch_generations(limit=LIMIT):
+    """
+    Fetch detailed generation data from PokéAPI.
+    Args:
+        limit (int): Number of generations to fetch.
+    Returns:
+        list: List of generation data dicts.
+    """
     gen_list = fetch_data("generation", limit)
     data = []
     for g in gen_list:
@@ -91,8 +134,13 @@ def fetch_generations(limit=LIMIT):
         })
     return data
 
-
 def load_to_postgres(table, records):
+    """
+    Load records into the specified Postgres table.
+    Args:
+        table (str): Table name ('pokemon', 'items', 'moves', 'generations').
+        records (list): List of dicts to insert.
+    """
     conn = psycopg2.connect(
         dbname="pokemon_db",
         user="user",
@@ -104,6 +152,7 @@ def load_to_postgres(table, records):
 
     if table == "pokemon":
         for r in records:
+            # Insert Pokémon data, serialize stats as JSON
             cur.execute("""
                 INSERT INTO pokemon (id, name, height, weight, base_experience, types, abilities, moves, stats)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
@@ -139,8 +188,10 @@ def load_to_postgres(table, records):
     cur.close()
     conn.close()
 
-
 def run_etl():
+    """
+    Run the full ETL process: fetch and load all data types.
+    """
     print("Fetching Pokémon...")
     load_to_postgres("pokemon", fetch_pokemon())
     print("Fetching Items...")
@@ -150,7 +201,6 @@ def run_etl():
     print("Fetching Generations...")
     load_to_postgres("generations", fetch_generations())
     print("✅ ETL process completed.")
-
 
 if __name__ == "__main__":
     run_etl()

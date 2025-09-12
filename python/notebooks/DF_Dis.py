@@ -1,29 +1,36 @@
+"""
+Marimo notebook for exploring Pokémon data loaded into Postgres.
+Provides interactive UI elements for filtering and visualizing Pokémon, moves, items, and generations.
+"""
+
 import marimo
 
 __generated_with = "0.15.3"
 app = marimo.App(width="medium")
 
-
+# Cell: Import main libraries
 @app.cell
 def _():
     import marimo as mo
     import pandas as pd
     return mo, pd
 
-
+# Cell: Set up SQLAlchemy engine for Postgres connection
 @app.cell
 def _():
     import os
     import sqlalchemy
 
+    # Get password from environment or use default
     _password = os.environ.get("POSTGRES_PASSWORD", "password")
 
+    # Build database URL
     DATABASE_URL = f"postgresql+psycopg2://user:{_password}@postgres:5432/pokemon_db"
 
     engine = sqlalchemy.create_engine(DATABASE_URL)
     return (engine,)
 
-
+# Cell: (Disabled) Example: How to load all tables with psycopg2 and pandas
 @app.cell(disabled=True)
 def _(mo):
     mo.md(
@@ -60,7 +67,7 @@ def _(mo):
     )
     return
 
-
+# Cell: Create a SQL view to flatten Pokémon stats and arrays for easier analysis
 @app.cell
 def _(engine, mo):
     _df = mo.sql(
@@ -92,20 +99,20 @@ def _(engine, mo):
     )
     return
 
-
+# Cell: Load the flattened Pokémon view into a DataFrame
 @app.cell
 def _(engine, pd):
     # Load the view into a DataFrame
     pokemon_flat = pd.read_sql("SELECT * FROM pokemon_flat", engine)
     return (pokemon_flat,)
 
-
+# Cell: Dropdown for Pokémon types
 @app.cell
 def _(mo, pd, pokemon_flat):
-    # Get unique types
+    # Get unique types from the 'types' column
     unique_types = sorted(pd.Series(pokemon_flat['types'].str.split(', ')).explode().unique())
 
-    # Create dropdown UI
+    # Create dropdown UI for type selection
     selected_type = mo.ui.dropdown(
         options=["All"] + unique_types,
         label="Select Pokémon Type - > ",
@@ -115,11 +122,10 @@ def _(mo, pd, pokemon_flat):
     selected_type
     return (selected_type,)
 
-
+# Cell: Dropdown for Pokémon moves
 @app.cell
 def _(mo, pd, pokemon_flat):
-
-    # Get unique moves
+    # Get unique moves from the 'moves' column
     unique_moves = sorted(pd.Series(pokemon_flat['moves'].str.split(', ')).explode().unique())
 
     # Dropdown for moves
@@ -131,16 +137,17 @@ def _(mo, pd, pokemon_flat):
     selected_move
     return (selected_move,)
 
-
+# Cell: Load generations table into pandas
 @app.cell
 def _(engine, pd):
     # Load generation table into pandas (assuming you already have SQLAlchemy engine)
     generation_df = pd.read_sql("SELECT * FROM generations", engine)
     return (generation_df,)
 
-
+# Cell: Dropdown for generations
 @app.cell
 def _(generation_df, mo, pd):
+    # Get unique generation names
     unique_genarations= sorted(pd.Series(generation_df['name']).unique())
     # Create dropdown for generations
     selected_generation = mo.ui.dropdown(
@@ -152,7 +159,7 @@ def _(generation_df, mo, pd):
     selected_generation
     return (selected_generation,)
 
-
+# Cell: Height range slider
 @app.cell
 def _(mo, pokemon_flat):
     height_slider = mo.ui.range_slider(
@@ -165,7 +172,7 @@ def _(mo, pokemon_flat):
     height_slider
     return (height_slider,)
 
-
+# Cell: Weight range slider
 @app.cell
 def _(mo, pokemon_flat):
     # Weight slider
@@ -179,7 +186,7 @@ def _(mo, pokemon_flat):
     weight_slider
     return (weight_slider,)
 
-
+# Cell: Base Experience range slider
 @app.cell
 def _(mo, pokemon_flat):
     # Base Experience slider
@@ -193,7 +200,7 @@ def _(mo, pokemon_flat):
     exp_slider
     return (exp_slider,)
 
-
+# Cell: Markdown for filtered table section
 @app.cell
 def _(mo):
     mo.md(
@@ -205,7 +212,7 @@ def _(mo):
     )
     return
 
-
+# Cell: Main filtering logic for Pokémon table
 @app.cell
 def _(
     exp_slider,
@@ -267,11 +274,10 @@ def _(
     mo.ui.table(
         df_filtered,
         page_size=25
-
     )
     return
 
-
+# Cell: Markdown for moves table section
 @app.cell
 def _(mo):
     mo.md(
@@ -282,7 +288,7 @@ def _(mo):
     )
     return
 
-
+# Cell: Show all moves table
 @app.cell
 def _(engine, mo):
     _df = mo.sql(
@@ -293,7 +299,7 @@ def _(engine, mo):
     )
     return
 
-
+# Cell: Markdown for items table section
 @app.cell
 def _(mo):
     mo.md(
@@ -304,7 +310,7 @@ def _(mo):
     )
     return
 
-
+# Cell: Show all items table
 @app.cell
 def _(engine, mo):
     _df = mo.sql(
@@ -315,7 +321,7 @@ def _(engine, mo):
     )
     return
 
-
+# Cell: Markdown for generations table section
 @app.cell
 def _(mo):
     mo.md(
@@ -326,7 +332,7 @@ def _(mo):
     )
     return
 
-
+# Cell: Show all generations table
 @app.cell
 def _(engine, mo):
     _df = mo.sql(
@@ -337,6 +343,6 @@ def _(engine, mo):
     )
     return
 
-
+# Main entrypoint: run the Marimo app
 if __name__ == "__main__":
     app.run()
