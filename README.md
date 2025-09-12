@@ -1,6 +1,7 @@
 # 🎯 Pokémon ETL Pipeline with Airflow, Postgres, and Marimo
 
-###Welcome to my **end-to-end ETL project** 
+### Welcome to my **end-to-end ETL project** 
+
                     ![pokemon-drake](https://github.com/user-attachments/assets/2f94c9e1-4397-4162-a5cd-3127ccae71f5)
 
 
