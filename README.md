@@ -223,6 +223,7 @@ uv:
 - **Marimo Notebook:** [http://localhost:5000](http://localhost:5000)  
 
 ---
+image.png
 
 ## 🤝 Contributing
 
