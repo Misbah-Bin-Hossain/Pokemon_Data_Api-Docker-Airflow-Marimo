@@ -1,6 +1,12 @@
 # 🎯 Pokémon ETL Pipeline with Airflow, Postgres, and Marimo
 
-Welcome to my **end-to-end ETL project** where I fetch data from the public [PokéAPI](https://pokeapi.co/), process it, and store it in a **Postgres database**.  
+### Welcome to my **end-to-end ETL project** 
+
+  
+  ![pokemon-drake](https://github.com/user-attachments/assets/2f94c9e1-4397-4162-a5cd-3127ccae71f5)
+
+
+Here I fetch data from the public [PokéAPI](https://pokeapi.co/), process it, and store it in a **Postgres database**.  
 I orchestrate the pipeline with **Apache Airflow**, visualize and explore with **Marimo notebooks**, and manage everything using **Docker Compose**.  
 
 ---
@@ -14,6 +20,8 @@ I orchestrate the pipeline with **Apache Airflow**, visualize and explore with *
 - **🐍 Python** → for the ETL scripts (using `requests`, `psycopg2`, `pandas`).
 
 ---
+
+
 
 ## 📂 Project Structure
 
