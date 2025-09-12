@@ -41,8 +41,8 @@ I orchestrate the pipeline with **Apache Airflow**, visualize and explore with *
 
 ### 1. Clone this repo
 ```bash
-git clone https://github.com/<your-username>/etl-pipeline-project.git
-cd etl-pipeline-project
+git clone https://github.com/Misbah-Bin-Hossain/Pokemon_Data_Api-Docker-Airflow-Marimo.git
+cd Pokemon_Data_Api-Docker-Airflow-Marimo
 ```
 
 ### 2. Start services with Docker Compose
@@ -56,23 +56,48 @@ This will start:
 - `airflow-scheduler` → runs DAGs  
 - `uv` → Marimo notebooks at [http://localhost:5000](http://localhost:5000)  
 
-### 3. Initialize Airflow
-Since Airflow needs DB setup and a user:
-```bash
-docker compose run airflow-init
-```
+### 3. Login Airflow
 
-Then restart Airflow:
-```bash
-docker compose restart airflow-webserver airflow-scheduler
-```
+`airflow-webserver` → Airflow UI at [http://localhost:8080](http://localhost:8080)  
+
 
 ✅ Login with:
 - username: `admin`
 - password: `admin`
 
 ### 4. Access Marimo
-Go to [http://localhost:5000](http://localhost:5000) to open Marimo and query Postgres interactively.
+
+To access Marimo in the `uv` container, follow these steps:
+
+```bash
+# 1. (Re)build and start the uv container
+#    --force-recreate ensures a fresh container, --build applies any changes
+
+docker compose up -d --force-recreate --build uv
+
+# 2. Enter the running uv container interactively
+
+docker exec -it etl-pipeline-project-uv-1 bash
+
+# 3. (Optional but recommended) Create a virtual environment for isolation
+python -m venv .venv
+
+# 4. Activate the virtual environment
+source .venv/bin/activate
+
+# 5. Install required Python packages for Marimo and data analysis
+pip install matplotlib pandas marimo
+
+# 6. Start Marimo, making it accessible from your browser
+python -m marimo edit --host 0.0.0.0 --port 8888
+```
+
+#### Why these steps?
+- **Rebuilding the container** ensures any changes to dependencies or code are applied, and avoids issues from stale environments.
+- **Entering the container** lets you run commands in the same environment where Marimo will operate.
+- **Using a virtual environment** keeps dependencies isolated, preventing conflicts with system or base image packages.
+- **Installing packages** ensures Marimo and data tools (matplotlib, pandas) are available, even if not pre-installed in the image.
+- **Running Marimo with `--host 0.0.0.0`** makes it accessible from your host machine at [http://localhost:8888](http://localhost:8888).
 
 ---
 
