@@ -65,17 +65,10 @@ services:
       context: ./python
     depends_on:
       - postgres
-
-  uv:
-    build:
-      context: ./uv
-    depends_on:
-      - postgres
     ports:
-      - "5000:5000"
-      - "8888:8888"  
+      - "8888:8888"
     volumes:
-      - ./uv/notebooks:/app/notebooks
-
+      - ./python/notebooks:/app/notebooks
+ 
 volumes:
   postgres_data:  

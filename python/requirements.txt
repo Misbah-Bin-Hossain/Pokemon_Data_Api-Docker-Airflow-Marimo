@@ -1,8 +1,19 @@
-requests
-pandas
-psycopg2-binary
+# Web frameworks and servers
+flask==2.0.1
+uvicorn>=0.22.0
+werkzeug==2.0.3
+
+# ORM and databases
+sqlalchemy==1.4.22
+flask-sqlalchemy==2.5.1
+psycopg2-binary==2.9.1
 duckdb
-sqlalchemy
+
+# Data and requests
+requests==2.26.0
+pandas>=2.0.0
+
+# Workflow and tools
 apache-airflow
 marimo
-uvicorn
+sqlglot

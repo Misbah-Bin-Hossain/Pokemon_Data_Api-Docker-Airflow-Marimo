@@ -1,11 +1,25 @@
-FROM python:3.9-slim
+# python/Dockerfile
+FROM python:3.11-slim
 
 WORKDIR /app
 
+# Install system dependencies if needed
+RUN apt-get update && apt-get install -y build-essential
+
+# Copy requirements (if you have one)
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Create venv, activate, and install requirements
+RUN python -m venv .venv && \
+    . .venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install pandas marimo
 
-COPY . .
+# Copy your notebooks (optional)
+COPY notebooks/ /app/notebooks/
 
-CMD ["python", "etl.py"]
+# Expose Marimo port
+EXPOSE 8888
+
+# Start Marimo automatically
+CMD ["/bin/bash", "-c", ". .venv/bin/activate && python -m marimo edit --host 0.0.0.0 --port 8888"]

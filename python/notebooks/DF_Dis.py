@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.15.2"
+__generated_with = "0.15.3"
 app = marimo.App(width="medium")
 
 
@@ -97,7 +97,6 @@ def _(engine, mo):
 def _(engine, pd):
     # Load the view into a DataFrame
     pokemon_flat = pd.read_sql("SELECT * FROM pokemon_flat", engine)
-
     return (pokemon_flat,)
 
 
@@ -137,7 +136,6 @@ def _(mo, pd, pokemon_flat):
 def _(engine, pd):
     # Load generation table into pandas (assuming you already have SQLAlchemy engine)
     generation_df = pd.read_sql("SELECT * FROM generations", engine)
-
     return (generation_df,)
 
 
@@ -152,7 +150,6 @@ def _(generation_df, mo, pd):
 
     # Display dropdown
     selected_generation
-
     return (selected_generation,)
 
 
@@ -257,12 +254,12 @@ def _(
     if g != "All":
         # Grab the Pokémon list for this generation
         gen_pokemon = generation_df.loc[generation_df['name'] == g, 'pokemon_species'].values[0]
-    
+
         # Ensure it's parsed into a Python list if stored as text/JSON
         if isinstance(gen_pokemon, str):
             import ast
             gen_pokemon = ast.literal_eval(gen_pokemon)
-    
+
         # Filter main dataframe
         df_filtered = df_filtered[df_filtered['name'].isin(gen_pokemon)]
 
@@ -272,7 +269,6 @@ def _(
         page_size=25
 
     )
-
     return
 
 
