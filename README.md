@@ -14,6 +14,8 @@ I orchestrate the pipeline with **Apache Airflow**, visualize and explore with *
 - **🐍 Python** → for the ETL scripts (using `requests`, `psycopg2`, `pandas`).
 
 ---
+![pokemon-drake](https://github.com/user-attachments/assets/2f94c9e1-4397-4162-a5cd-3127ccae71f5)
+
 
 ## 📂 Project Structure
 
