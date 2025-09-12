@@ -246,6 +246,7 @@ uv:
 
 - **Airflow UI:** [http://localhost:8080](http://localhost:8080)  
 - **Marimo Notebook:** [http://localhost:5000](http://localhost:5000)  
+<img width="888" height="991" alt="image" src="https://github.com/user-attachments/assets/57a2ccc9-c5d1-48a9-9a87-4cd9a60afc0b" />
 
 ---
 image.png
