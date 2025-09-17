@@ -1,4 +1,5 @@
-# python/Dockerfile
+# Dockerfile for Python ETL and Marimo notebook service
+# Sets up a venv, installs core libs, and launches Marimo UI on port 8888
 FROM python:3.11-slim
 
 WORKDIR /app

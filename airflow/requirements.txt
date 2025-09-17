@@ -1,3 +1,5 @@
+# Python dependencies for the Airflow image
+# Includes Postgres provider and libraries used by the ETL tasks
 apache-airflow-providers-postgres
 requests
 pandas

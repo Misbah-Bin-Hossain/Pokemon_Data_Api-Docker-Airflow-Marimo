@@ -1,3 +1,5 @@
+# Python dependencies for the standalone ETL and Marimo notebook
+# Includes DB drivers, data libs, and workflow tools used in this project
 # Web frameworks and servers
 flask==2.0.1
 uvicorn>=0.22.0

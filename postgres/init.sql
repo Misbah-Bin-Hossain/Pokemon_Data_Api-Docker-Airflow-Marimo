@@ -1,3 +1,6 @@
+-- Schema initialization for Pokémon ETL
+-- Creates base tables for pokemon, items, moves, and generations
+
 CREATE TABLE IF NOT EXISTS pokemon (
     id INT PRIMARY KEY,
     name TEXT,

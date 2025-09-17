@@ -1,3 +1,6 @@
+# Dockerfile for the Airflow image used to run the ETL DAGs
+# - Installs minimal system tools
+# - Installs Python dependencies from requirements.txt
 FROM apache/airflow:2.8.0
 
 # Switch to root to install system deps

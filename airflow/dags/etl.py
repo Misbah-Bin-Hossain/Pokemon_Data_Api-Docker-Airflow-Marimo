@@ -1,3 +1,10 @@
+"""
+Core ETL functions used by Airflow and standalone execution.
+- Extracts data from PokéAPI (pokemon, items, moves, generations)
+- Transforms responses into structured dicts
+- Loads records into Postgres tables
+"""
+
 import requests
 import psycopg2
 import time
@@ -9,6 +16,13 @@ LIMIT = 10000  # change to None for all data
 
 
 def fetch_data(endpoint, limit=LIMIT):
+    """Fetch list resources from a PokéAPI endpoint.
+    Args:
+        endpoint: Endpoint path, e.g. 'pokemon', 'item'.
+        limit: Max number of results; None to fetch all.
+    Returns:
+        List of objects with 'name' and 'url'.
+    """
     url = f"{BASE_URL}/{endpoint}"
     if limit:
         url += f"?limit={limit}"
@@ -18,12 +32,19 @@ def fetch_data(endpoint, limit=LIMIT):
 
 
 def fetch_detail(url):
+    """Fetch a single resource payload from its URL.
+    Args:
+        url: Absolute PokéAPI resource URL.
+    Returns:
+        Parsed JSON dict for the resource.
+    """
     response = requests.get(url)
     response.raise_for_status()
     return response.json()
 
 
 def fetch_pokemon(limit=LIMIT):
+    """Fetch detailed Pokémon entities and normalize fields."""
     pokemon_list = fetch_data("pokemon", limit)
     data = []
     for idx, p in enumerate(pokemon_list, start=1):
@@ -46,6 +67,7 @@ def fetch_pokemon(limit=LIMIT):
 
 
 def fetch_items(limit=LIMIT):
+    """Fetch item entities and select core attributes."""
     item_list = fetch_data("item", limit)
     data = []
     for i in item_list:
@@ -61,6 +83,7 @@ def fetch_items(limit=LIMIT):
 
 
 def fetch_moves(limit=LIMIT):
+    """Fetch move entities including power, accuracy, and type."""
     move_list = fetch_data("move", limit)
     data = []
     for m in move_list:
@@ -78,6 +101,7 @@ def fetch_moves(limit=LIMIT):
 
 
 def fetch_generations(limit=LIMIT):
+    """Fetch generations with region, species list, and moves."""
     gen_list = fetch_data("generation", limit)
     data = []
     for g in gen_list:
@@ -93,6 +117,11 @@ def fetch_generations(limit=LIMIT):
 
 
 def load_to_postgres(table, records):
+    """Insert list of records into a Postgres table.
+    Args:
+        table: One of 'pokemon', 'items', 'moves', 'generations'.
+        records: Iterable of dicts to insert.
+    """
     conn = psycopg2.connect(
         dbname="pokemon_db",
         user="user",
@@ -141,6 +170,7 @@ def load_to_postgres(table, records):
 
 
 def run_etl():
+    """Run end-to-end ETL for all resource types."""
     print("Fetching Pokémon...")
     load_to_postgres("pokemon", fetch_pokemon())
     print("Fetching Items...")

@@ -1,6 +1,10 @@
+# Docker Compose configuration for the Pokémon ETL stack
+# Services: Postgres (DB), Airflow (webserver, scheduler, init), and Python/Marimo UI
+# Usage: docker compose up --build
 version: '3.8'
 
 services:
+  # Postgres database for persisting Pokémon data
   postgres:
     image: postgres:latest
     environment:
@@ -8,11 +12,13 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: pokemon_db
     volumes:
+      # Initialize schema and persist data files across restarts
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data   
     ports:
-      - "5432:5432"
+      - "5432:5432"  # host:container
 
+  # Airflow web UI for monitoring and triggering DAGs
   airflow-webserver:
     build:
       context: ./airflow
@@ -20,17 +26,18 @@ services:
       - postgres
       - airflow-init
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Airflow UI
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/pokemon_db
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/dags:/opt/airflow/dags  # mount local DAGs
     command: bash -c "
       sleep 10 &&
       airflow webserver"
 
+  # Airflow scheduler to execute DAG tasks on schedule
   airflow-scheduler:
     build:
       context: ./airflow
@@ -43,9 +50,10 @@ services:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/pokemon_db
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     volumes:
-      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/dags:/opt/airflow/dags  # mount local DAGs
     command: airflow scheduler
 
+  # One-time Airflow initialization: DB init and admin user creation
   airflow-init:
     image: apache/airflow:2.8.0
     depends_on:
@@ -60,15 +68,16 @@ services:
       "
     restart: "no"
 
+  # Python container running Marimo notebooks for data exploration
   python_etl:
     build:
       context: ./python
     depends_on:
       - postgres
     ports:
-      - "8888:8888"
+      - "8888:8888"  # Marimo UI
     volumes:
-      - ./python/notebooks:/app/notebooks
+      - ./python/notebooks:/app/notebooks  # persist notebooks
  
 volumes:
   postgres_data:  
